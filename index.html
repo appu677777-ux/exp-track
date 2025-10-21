@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Lock Screen -->
+    <div id="lock-screen" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-sm mx-auto">
+            <h2 class="text-2xl font-bold mb-4">Enter PIN</h2>
+            <input id="pin-input" type="password" maxlength="4" class="border border-gray-300 p-2 rounded w-full mb-4" placeholder="4-digit PIN">
+            <button id="unlock-btn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Unlock</button>
+            <p id="error-msg" class="text-red-500 mt-2 hidden">Incorrect PIN. Try again.</p>
+        </div>
+    </div>
+
+    <!-- Main App (Hidden Initially) -->
+    <div id="main-app" class="hidden container mx-auto p-4 max-w-4xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl md:text-3xl font-bold">Expense Tracker</h1>
+            <button id="logout-btn" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Logout</button>
+        </div>
+        
+        <!-- Totals Display -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-green-100 p-4 rounded-lg text-center">
+                <h3 class="text-lg font-semibold">Total Income</h3>
+                <p id="total-income" class="text-xl md:text-2xl font-bold text-green-600">₹0</p>
+            </div>
+            <div class="bg-red-100 p-4 rounded-lg text-center">
+                <h3 class="text-lg font-semibold">Total Expenses</h3>
+                <p id="total-expenses" class="text-xl md:text-2xl font-bold text-red-600">₹0</p>
+            </div>
+            <div class="bg-blue-100 p-4 rounded-lg text-center">
+                <h3 class="text-lg font-semibold">Balance</h3>
+                <p id="balance" class="text-xl md:text-2xl font-bold text-blue-600">₹0</p>
+            </div>
+        </div>
+
+        <!-- Forms -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Add Income -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Add Income</h2>
+                <form id="income-form">
+                    <input type="number" id="income-amount" placeholder="Amount" class="border border-gray-300 p-2 rounded w-full mb-2" required>
+                    <input type="text" id="income-desc" placeholder="Description" class="border border-gray-300 p-2 rounded w-full mb-4" required>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full">Add Income</button>
+                </form>
+            </div>
+
+            <!-- Add Expense -->
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Add Expense</h2>
+                <form id="expense-form">
+                    <input type="number" id="expense-amount" placeholder="Amount" class="border border-gray-300 p-2 rounded w-full mb-2" required>
+                    <input type="text" id="expense-desc" placeholder="Description" class="border border-gray-300 p-2 rounded w-full mb-4" required>
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full">Add Expense</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-white p-6 rounded-lg shadow mb-8">
+            <h2 class="text-xl font-semibold mb-4">Financial Overview (Total Income Breakdown)</h2>
+            <canvas id="finance-chart"></canvas>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                <h2 class="text-xl font-semibold mb-2 md:mb-0">Transaction History</h2>
+                <button id="clear-all-btn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Clear All Data</button>
+            </div>
+            <ul id="transaction-list" class="space-y-2"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Hardcoded PIN (change for security)
+        const PIN = "2005";
+
+        // Elements
+        const lockScreen = document.getElementById('lock-screen');
+        const mainApp = document.getElementById('main-app');
+        const pinInput = document.getElementById('pin-input');
+        const unlockBtn = document.getElementById('unlock-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const incomeForm = document.getElementById('income-form');
+        const expenseForm = document.getElementById('expense-form');
+        const totalIncomeEl = document.getElementById('total-income');
+        const totalExpensesEl = document.getElementById('total-expenses');
+        const balanceEl = document.getElementById('balance');
+        const transactionList = document.getElementById('transaction-list');
+        const chartCanvas = document.getElementById('finance-chart');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Data storage
+        let incomes = JSON.parse(localStorage.getItem('incomes')) || [];
+        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        let chart;
+
+        // Initialize on load
+        window.onload = () => {
+            // Show lock screen
+            lockScreen.classList.remove('hidden');
+            mainApp.classList.add('hidden');
+        };
+
+        // Unlock logic
+        unlockBtn.addEventListener('click', () => {
+            if (pinInput.value === PIN) {
+                lockScreen.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                updateUI();
+            } else {
+                errorMsg.classList.remove('hidden');
+                setTimeout(() => errorMsg.classList.add('hidden'), 2000);
+            }
+        });
+
+        // Logout logic
+        logoutBtn.addEventListener('click', () => {
+            mainApp.classList.add('hidden');
+            lockScreen.classList.remove('hidden');
+            pinInput.value = ''; // Clear PIN input
+        });
+
+        // Add Income
+        incomeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('income-amount').value);
+            const desc = document.getElementById('income-desc').value;
+            incomes.push({ amount, desc, date: new Date().toLocaleString() });
+            localStorage.setItem('incomes', JSON.stringify(incomes));
+            updateUI();
+            incomeForm.reset();
+        });
+
+        // Add Expense
+        expenseForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            const desc = document.getElementById('expense-desc').value;
+            expenses.push({ amount, desc, date: new Date().toLocaleString() });
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            updateUI();
+            expenseForm.reset();
+        });
+
+        // Clear All Data
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                incomes = [];
+                expenses = [];
+                localStorage.removeItem('incomes');
+                localStorage.removeItem('expenses');
+                updateUI();
+            }
+        });
+
+        // Update UI
+        function updateUI() {
+            const totalIncome = incomes.reduce((sum, inc) => sum + inc.amount, 0);
+            const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const balance = totalIncome - totalExpenses;
+
+            totalIncomeEl.textContent = `₹${totalIncome.toFixed(2)}`;
+            totalExpensesEl.textContent = `₹${totalExpenses.toFixed(2)}`;
+            balanceEl.textContent = `₹${balance.toFixed(2)}`;
+
+            // Update Chart (Pie chart where total income = 100% = expenses + balance)
+            if (chart) chart.destroy();
+            if (totalIncome > 0) {
+                chart = new Chart(chartCanvas, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Expenses', 'Balance'],
+                        datasets: [{
+                            data: [totalExpenses, balance > 0 ? balance : 0],  // If balance negative, show 0 for balance slice
+                            backgroundColor: ['#EF4444', '#10B981']
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.parsed;
+                                        const percentage = ((value / totalIncome) * 100).toFixed(2);
+                                        return `${context.label}: ₹${value.toFixed(2)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // If no income, show a message or empty chart
+                chartCanvas.getContext('2d').clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+                const ctx = chartCanvas.getContext('2d');
+                ctx.font = '20px Arial';
+                ctx.fillStyle = '#999';
+                ctx.textAlign = 'center';
+                ctx.fillText('No income data to display', chartCanvas.width / 2, chartCanvas.height / 2);
+            }
+
+            // Update Transaction List with Edit/Delete buttons
+            transactionList.innerHTML = '';
+            const allTransactions = [
+                ...incomes.map((inc, index) => ({ ...inc, type: 'Income', color: 'text-green-600', array: 'incomes', index })),
+                ...expenses.map((exp, index) => ({ ...exp, type: 'Expense', color: 'text-red-600', array: 'expenses', index }))
+            ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            allTransactions.forEach(trans => {
+                const li = document.createElement('li');
+                li.className = `flex flex-col md:flex-row justify-between items-start md:items-center ${trans.color} p-2 border-b`;
+                li.innerHTML = `
+                    <span class="text-sm md:text-base mb-2 md:mb-0">${trans.type}: ${trans.desc} - ₹${trans.amount.toFixed(2)} (${trans.date})</span>
+                    <div class="flex space-x-2">
+                        <button class="edit-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm" data-array="${trans.array}" data-index="${trans.index}">Edit</button>
+                        <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm" data-array="${trans.array}" data-index="${trans.index}">Delete</button>
+                    </div>
+                `;
+                transactionList.appendChild(li);
+            });
+
+            // Add event listeners for edit and delete
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const array = e.target.dataset.array;
+                    const index = parseInt(e.target.dataset.index);
+                    const trans = (array === 'incomes' ? incomes : expenses)[index];
+                    const newAmount = prompt('Enter new amount:', trans.amount);
+                    const newDesc = prompt('Enter new description:', trans.desc);
+                    if (newAmount !== null && newDesc !== null && !isNaN(parseFloat(newAmount))) {
+                        trans.amount = parseFloat(newAmount);
+                        trans.desc = newDesc;
+                        localStorage.setItem(array, JSON.stringify(array === 'incomes' ? incomes : expenses));
+                        updateUI();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (confirm('Are you sure you want to delete this transaction?')) {
+                        const array = e.target.dataset.array;
+                        const index = parseInt(e.target.dataset.index);
+                        if (array === 'incomes') {
+                            incomes.splice(index, 1);
+                            localStorage.setItem('incomes', JSON.stringify(incomes));
+                        } else {
+                            expenses.splice(index, 1);
+                            localStorage.setItem('expenses', JSON.stringify(expenses));
+                        }
+                        updateUI();
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
