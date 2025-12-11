@@ -1,8 +1,7 @@
-// Security PIN
+// ================= SECURITY PIN =================
 const PIN = localStorage.getItem("appPIN") || "2005";
 
-
-// Elements
+// ================= ELEMENTS =================
 const lockScreen = document.getElementById("lock-screen");
 const mainApp = document.getElementById("main-app");
 const pinInput = document.getElementById("pin-input");
@@ -19,13 +18,13 @@ const balanceEl = document.getElementById("balance");
 const chartCanvas = document.getElementById("finance-chart");
 const logoutBtn = document.getElementById("logout-btn");
 
-// Load saved data
+// ================= LOAD DATA =================
 let incomes = JSON.parse(localStorage.getItem("incomes")) || [];
 let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
 
 let chart;
 
-// Show lock at start
+// ================= THEME + LOCKSCREEN =================
 window.onload = () => {
     if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("bg-black", "text-white");
@@ -35,7 +34,7 @@ window.onload = () => {
     mainApp.classList.add("hidden");
 };
 
-// Unlock App
+// ================= UNLOCK APP =================
 unlockBtn.addEventListener("click", () => {
     if (pinInput.value === PIN) {
         lockScreen.classList.add("hidden");
@@ -47,14 +46,14 @@ unlockBtn.addEventListener("click", () => {
     }
 });
 
-// Logout
+// ================= LOGOUT =================
 logoutBtn.addEventListener("click", () => {
     mainApp.classList.add("hidden");
     lockScreen.classList.remove("hidden");
     pinInput.value = "";
 });
 
-// Add Income
+// ================= ADD INCOME =================
 incomeForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -65,12 +64,11 @@ incomeForm.addEventListener("submit", (e) => {
     });
 
     localStorage.setItem("incomes", JSON.stringify(incomes));
-
     incomeForm.reset();
     updateUI();
 });
 
-// Add Expense
+// ================= ADD EXPENSE =================
 expenseForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -81,25 +79,44 @@ expenseForm.addEventListener("submit", (e) => {
     });
 
     localStorage.setItem("expenses", JSON.stringify(expenses));
-
     expenseForm.reset();
     updateUI();
 });
 
-// Update Main Page UI
+// ================= DENOMINATION FUNCTION =================
+function convertToDenomination(amount) {
+    amount = Math.floor(amount);
+
+    let crore = Math.floor(amount / 10000000);
+    let lakh = Math.floor((amount % 10000000) / 100000);
+    let thousand = Math.floor((amount % 100000) / 1000);
+    let rupees = amount % 1000;
+
+    let parts = [];
+
+    if (crore > 0) parts.push(`${crore} Crore`);
+    if (lakh > 0) parts.push(`${lakh} Lakh`);
+    if (thousand > 0) parts.push(`${thousand} Thousand`);
+    if (rupees > 0 || amount === 0) parts.push(`${rupees} Rupees`);
+
+    return parts.join(" ");
+}
+
+// ================= UPDATE UI =================
 function updateUI() {
     const totalIncome = incomes.reduce((s, x) => s + x.amount, 0);
     const totalExpenses = expenses.reduce((s, x) => s + x.amount, 0);
     const balance = totalIncome - totalExpenses;
 
-    totalIncomeEl.textContent = `₹${totalIncome.toFixed(2)}`;
-    totalExpensesEl.textContent = `₹${totalExpenses.toFixed(2)}`;
-    balanceEl.textContent = `₹${balance.toFixed(2)}`;
+    // DENOMINATION DISPLAY
+    totalIncomeEl.textContent = convertToDenomination(totalIncome);
+    totalExpensesEl.textContent = convertToDenomination(totalExpenses);
+    balanceEl.textContent = convertToDenomination(balance);
 
     updateChart(totalIncome, totalExpenses, balance);
 }
 
-// Chart Update
+// ================= PIE CHART =================
 function updateChart(totalIncome, totalExpenses, balance) {
     if (chart) chart.destroy();
 
