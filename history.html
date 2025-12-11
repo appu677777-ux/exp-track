@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Transaction History</title>
+
+        <!-- TailwindCSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 p-4">
+
+        <div class="max-w-4xl mx-auto">
+
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold">Transaction History</h1>
+
+                <a href="index.html"
+                    class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500">
+                    Back
+                </a>
+            </div>
+
+            <!-- Clear All Button -->
+            <button id="clear-all-btn"
+                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mb-4">
+                Clear All Data
+            </button>
+
+            <!-- Transaction List -->
+            <ul id="transaction-list" class="space-y-2"></ul>
+        </div>
+
+        <!-- Bottom Navbar -->
+        <nav
+            class="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg md:hidden">
+            <div class="flex justify-around py-3">
+
+                <!-- Home -->
+                <a href="index.html"
+                    class="flex flex-col items-center text-gray-600 hover:text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6" />
+                    </svg>
+                    <span class="text-xs mt-1">Home</span>
+                </a>
+
+                <!-- History -->
+                <a href="history.html"
+                    class="flex flex-col items-center text-gray-600 hover:text-purple-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="text-xs mt-1">History</span>
+                </a>
+
+                <!-- Pocket -->
+                <a href="pocket.html"
+                    class="flex flex-col items-center text-gray-600 hover:text-green-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7m16 0V7a2 2 0 00-2-2h-3m5 7H4" />
+                    </svg>
+                    <span class="text-xs mt-1">Pocket</span>
+                </a>
+
+                <!-- Settings -->
+                <a href="settings.html"
+                    class="flex flex-col items-center text-gray-600 hover:text-gray-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.89 3.31.877 2.42 2.42a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.89 1.543-.877 3.31-2.42 2.42a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.89-3.31-.877-2.42-2.42a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.89-1.543.877-3.31 2.42-2.42a1.724 1.724 0 002.573-1.066z" />
+                    </svg>
+                    <span class="text-xs mt-1">Settings</span>
+                </a>
+
+            </div>
+        </nav>
+
+        <!-- External Logic -->
+        <script src="history.js"></script>
+    </body>
+</html>
