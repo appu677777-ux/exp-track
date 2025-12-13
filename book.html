@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book</title>
+  <style>
+/* Fade + Slide In */
+.note-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.note-enter-active {
+  transition: all 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fade Out */
+.note-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.note-exit-active {
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+}
+</style>
+
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-4 font-sans">
+
+  <div class="max-w-lg mx-auto">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-5">
+      <h1 class="text-2xl font-bold">Book</h1>
+      <a href="pocket.html"
+         class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+        Back
+      </a>
+    </div>
+
+    <!-- Entry Card -->
+    <div class="bg-white shadow rounded-lg p-4 mb-5">
+      <h2 class="text-lg font-semibold mb-3">Add Entry</h2>
+
+      <select id="entry-type"
+        class="w-full border p-2 rounded mb-3">
+        <option value="give">To Give</option>
+        <option value="get">To Get</option>
+      </select>
+
+      <input id="entry-amount"
+        type="number"
+        placeholder="Enter amount (₹)"
+        class="w-full border p-2 rounded mb-3" />
+
+      <button id="add-entry-btn"
+        class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+        Add
+      </button>
+    </div>
+
+    <!-- Entries -->
+    <h2 class="text-lg font-semibold mb-2">Entries</h2>
+
+    <div id="entry-list"
+      class="bg-white shadow rounded-lg p-4 space-y-3 h-80 overflow-y-auto">
+      <!-- Entries appear here -->
+    </div>
+  </div>
+
+  <script src="book.js"></script>
+</body>
+</html>
