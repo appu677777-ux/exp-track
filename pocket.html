@@ -75,6 +75,12 @@
                 class="bg-white shadow rounded-lg p-4 h-80 overflow-y-auto space-y-3">
                 <!-- Notes appear here -->
             </div>
+
+            <button id="secure-button"
+                class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 my-20">
+                Go to Book
+            </button>
+
         </div>
 
         <!-- Bottom Navbar -->
@@ -96,7 +102,8 @@
                 </a>
 
                 <!-- History -->
-                <a href="history.html"
+                <a href="#"
+                    id="history-btn"
                     class="flex flex-col items-center text-gray-600 hover:text-purple-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
                         fill="none"
@@ -110,7 +117,7 @@
 
                 <!-- Pocket -->
                 <a href="pocket.html"
-                    class="flex flex-col items-center text-blue-600 hover:text-green-600">
+                    class="flex flex-col items-center text-gray-600 hover:text-green-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
                         fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
@@ -137,7 +144,70 @@
             </div>
         </nav>
 
+        <!-- PIN LOCK MODAL -->
+        <div id="pin-modal"
+            class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+
+            <div class="bg-white rounded-lg p-6 w-80 text-center">
+                <h2 class="text-lg font-semibold mb-3">Enter PIN</h2>
+
+                <input id="pin-input"
+                    type="number"
+                    placeholder="Enter PIN"
+                    class="w-full border p-2 rounded mb-3 text-center">
+
+                <p id="pin-error" class="text-red-500 text-sm mb-2 hidden">
+                    Incorrect PIN
+                </p>
+
+                <div class="flex justify-between gap-2">
+                    <button id="cancel-pin"
+                        class="w-full bg-gray-300 py-2 rounded">
+                        Cancel
+                    </button>
+
+                    <button id="submit-pin"
+                        class="w-full bg-blue-600 text-white py-2 rounded">
+                        Unlock
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY PIN MODAL -->
+        <div id="history-modal"
+            class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+
+            <div class="bg-white rounded-lg p-6 w-80 text-center shadow-lg">
+                <h2 class="text-lg font-semibold mb-3">Enter PIN to view
+                    History</h2>
+
+                <input
+                    id="history-pin-input"
+                    type="number"
+                    placeholder="Enter PIN"
+                    class="w-full border p-2 rounded mb-3 text-center" />
+
+                <p id="history-pin-error"
+                    class="text-red-500 text-sm mb-2 hidden">
+                    Incorrect PIN
+                </p>
+
+                <div class="flex gap-2">
+                    <button id="history-cancel"
+                        class="w-full bg-gray-300 py-2 rounded">
+                        Cancel
+                    </button>
+
+                    <button id="history-submit"
+                        class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700">
+                        Unlock
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script src="pocket.js"></script>
+        <script src="modalLock.js"></script>
     </body>
 </html>
-
