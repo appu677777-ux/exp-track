@@ -143,3 +143,10 @@ function updateChart(totalIncome, totalExpenses, balance) {
         },
     });
 }
+
+
+
+
+
+
+
