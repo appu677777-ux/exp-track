@@ -4,6 +4,17 @@ const noteType = document.getElementById("note-type");
 const addNoteBtn = document.getElementById("add-note-btn");
 const noteList = document.getElementById("note-list");
 
+
+// PIN LOCK LOGIC
+const goToBookBtn = document.getElementById("secure-button");
+const pinModal = document.getElementById("pin-modal");
+const pinInput = document.getElementById("pin-input");
+const submitPin = document.getElementById("submit-pin");
+const cancelPin = document.getElementById("cancel-pin");
+const pinError = document.getElementById("pin-error");
+
+const BOOK_PIN = "0001";
+
 // Load notes from localStorage
 let notes = JSON.parse(localStorage.getItem("pocketNotes")) || [];
 
@@ -106,4 +117,29 @@ function addDeleteEvents() {
         });
     });
 }
+
+
+// Open modal
+goToBookBtn.addEventListener("click", () => {
+    pinModal.classList.remove("hidden");
+    pinModal.classList.add("flex");
+    pinInput.value = "";
+    pinError.classList.add("hidden");
+    pinInput.focus();
+});
+
+// Cancel
+cancelPin.addEventListener("click", () => {
+    pinModal.classList.add("hidden");
+});
+
+// Submit PIN
+submitPin.addEventListener("click", () => {
+    if (pinInput.value === BOOK_PIN) {
+        window.location.href = "book.html";
+    } else {
+        pinError.classList.remove("hidden");
+        pinInput.value = "";
+    }
+});
 
