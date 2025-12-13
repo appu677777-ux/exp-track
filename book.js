@@ -1,5 +1,6 @@
 // ELEMENTS
 const entryType = document.getElementById("entry-type");
+const entryName = document.getElementById("entry-name");
 const entryAmount = document.getElementById("entry-amount");
 const addEntryBtn = document.getElementById("add-entry-btn");
 const entryList = document.getElementById("entry-list");
@@ -12,16 +13,14 @@ function renderEntries() {
   entryList.innerHTML = "";
 
   if (entries.length === 0) {
-    entryList.innerHTML = `
-      <p class="text-gray-500 text-center">No entries yet</p>
-    `;
+    entryList.innerHTML =
+      `<p class="text-gray-500 text-center">No entries yet</p>`;
     return;
   }
 
   entries.forEach((entry, index) => {
     const div = document.createElement("div");
 
-    // ENTRY CARD
     div.className = `note-enter flex justify-between items-center p-3 rounded border
       ${entry.type === "give"
         ? "border-red-300 bg-red-50"
@@ -29,10 +28,11 @@ function renderEntries() {
 
     div.innerHTML = `
       <div>
-        <p class="font-semibold">
+        <p class="font-semibold">${entry.name}</p>
+        <p class="text-sm">
           ${entry.type === "give" ? "To Give" : "To Get"}
+          <span class="font-medium">₹${entry.amount}</span>
         </p>
-        <p class="text-sm text-gray-600">₹ ${entry.amount}</p>
       </div>
 
       <button
@@ -44,7 +44,6 @@ function renderEntries() {
 
     entryList.appendChild(div);
 
-    // ENTER ANIMATION
     requestAnimationFrame(() => {
       div.classList.add("note-enter-active");
     });
@@ -54,16 +53,23 @@ function renderEntries() {
 // ADD ENTRY
 addEntryBtn.addEventListener("click", () => {
   const type = entryType.value;
+  const name = entryName.value.trim();
   const amount = entryAmount.value.trim();
+
+  if (!name) {
+    alert("Please enter a name");
+    return;
+  }
 
   if (!amount || amount <= 0) {
     alert("Please enter a valid amount");
     return;
   }
 
-  entries.push({ type, amount });
+  entries.push({ type, name, amount });
   localStorage.setItem("bookEntries", JSON.stringify(entries));
 
+  entryName.value = "";
   entryAmount.value = "";
   renderEntries();
 });
@@ -71,7 +77,6 @@ addEntryBtn.addEventListener("click", () => {
 // MARK ENTRY AS DONE WITH EXIT ANIMATION
 function markDone(index) {
   const item = entryList.children[index];
-
   if (!item) return;
 
   item.classList.add("note-exit");
